@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Oswald:wght@400;500;600&display=swap');
+
+        body,
+        html {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .navbar {
+            background-color: #1d2d50;
+            color: #f5f6fa;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 50;
+        }
+
+        .navbar a {
+            text-decoration: none;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1d2d50, #0a0b14);
+      color: #f5f6fa;
+      display: flex;
+      justify-content: center; 
+      align-items: center; 
+    }
+
+      
+        .button {
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, #fcbd56, #ff8c00);
+            color: #1d2d50;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: linear-gradient(45deg, #ff8c00, #fcbd56);
+            color: #1d2d50;
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: #f5f6fa;
+            color: #1d2d50;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-button:hover {
+            background-color: #fcbd56;
+            color: #1d2d50;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .nav-button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .navbar .login-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .footer {
+
+            text-align: center;
+            padding: 20px;
+            color: #ffffff;
+            font-size: 1rem;
+            background: none;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+        }
+
+        .footer p {
+            margin: 0;
+            color: #f0f0f0;
+        }
+
+        .footer p:hover {
+            color: #ffbd56;
+            cursor: pointer;
+        }
+
+
+        .container {
+            background-color: #222c3b;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            padding: 24px;
+        }
+
+        .nav-button-container a {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    .navbar a {
+        text-decoration: none; 
+    }
+
+    .navbar a:hover {
+        text-decoration: none;  
+    }
+    </style>
+</head>
+
+<body class="text-gray-200">
+
+    <header class="navbar">
+        <div class="container mx-auto p-4 flex items-center justify-center">
+            <div class="nav-button-container">
+                <a class="nav-button" href="/">Home</a>
+                <a class="nav-button" href="/team">Teams</a>
+                <a class="nav-button" href="/player">Players</a>
+                <a class="nav-button" href="/matchup">Matchup Builder</a>
+
+                <div class="nav-button-container login-btn">
+
+                    <% if (user&&user.username) { %>
+                        <a class="nav-button" href="/user/logout">Logout</a>
+                        <% } else { %>
+                            <a class="nav-button" href="/user">Login</a>
+                            <% } %>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main class="pt-32 text-center">
+            <%- body %> 
+        <footer class="footer">
+            <p>&copy; StatBee. All Rights Reserved.</p>
+        </footer>
+    </main>
+
+
+
+</body>
+
+</html>
