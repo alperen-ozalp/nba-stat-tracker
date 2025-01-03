@@ -10,4 +10,4 @@ A web-based application for tracking and analyzing NBA player and team statistic
 - **Backend**: Node.js
 - **Frontend**: EJS (Embedded JavaScript)
 - **Database**: SQL
-- **Styling**: [Tailwind]
+- **Styling**: Tailwind
