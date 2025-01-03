@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= title %>
+  </title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .logo-hover {
+      transition: transform 0.4s ease, filter 0.4s ease;
+      box-shadow: 0 2px 10px rgba(0, 255, 85, 0.2);
+    }
+
+    .logo-clicked {
+      transform: scale(1.4) translateY(-70px);
+    }
+
+    .logo-hover:active {
+      transform: scale(1.25);
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+    }
+
+    .button-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      background: linear-gradient(45deg, #fcbd56, #ff8c00);
+      color: #1d2d50;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .button-hover:hover {
+      background: linear-gradient(45deg, #ff8c00, #fcbd56);
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-900 dark:bg-gray-900 text-white">
+
+  <div class="container mx-auto p-6">
+    <h1 class="text-center text-3xl font-bold text-white">
+      <%= title %>
+    </h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
+      <% teams.forEach(team => { %>
+        <div class="bg-gray-800 dark:bg-gray-700 rounded-lg shadow-lg p-6 text-center transition-all duration-300 card-hover">
+          <a href="/team/<%= team.team_id %>" class="logo-hover">
+            <img src="<%= team.logo %>" alt="<%= team.full_name %>"
+              class="w-75 h-75 mx-auto mb-4 transition-all duration-300 hover:scale-110" style="object-fit: contain;" />
+          </a>
+          <div class="text-lg font-semibold text-white-400 dark:text-blue-300">
+            <a href="/team/<%= team.team_id %>" class="hover:text-blue-500 dark:hover:text-blue-400">
+              <%= team.full_name %>
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="/" class="button-hover">Go to Home</a>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.logo-hover').forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        const link = item.getAttribute('href');
+        const logo = item.querySelector('img');
+
+        logo.classList.add('logo-clicked');
+
+        setTimeout(() => {
+          window.location.href = link;
+          logo.classList.remove('logo-clicked');
+        }, 1000);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

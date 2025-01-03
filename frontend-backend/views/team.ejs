@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .player-card {
+      background-color: #1c1f2a;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .player-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 5px 15px rgba(146, 103, 255, 0.3);
+    }
+
+    .player-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f6faff;
+      transition: color 0.3s ease;
+    }
+
+    .player-name:hover {
+      color: #4c9fff;
+      text-decoration: underline;
+    }
+
+    .player-position {
+      font-size: 1rem;
+      color: #f6faff;
+    }
+
+    body {
+        background-color: #000000;  
+    }
+
+    .player-image {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      border: 2px solid #f5e8e8; 
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .player-image:hover {
+      transform: scale(1.1);  
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);  
+    }
+
+    .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;  
+            background-color: rgba(0, 0, 0, 0.4); 
+        }
+
+        .modal-content {
+            background-color: #1d2d50;
+            color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+        }
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      transition: color 0.3s ease;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .dark .player-card {
+      background-color: #2a2e3b; 
+    }
+
+    .dark .player-name {
+      color: #e0f7ff;  
+    }
+
+    .dark .player-position {
+      color: #e0f7ff;
+    }
+  </style>
+  <script>
+    
+    function openModal(type) {
+    if (type === 'stats') {
+        // "Update Stats" modalını aç
+        document.getElementById('statsModal').style.display = 'block';
+    } else if (type === 'team') {
+        // "Update Team Roster" modalını aç
+        document.getElementById('teamModal').style.display = 'block';
+    }
+  }
+
+    function closeModal() {
+        document.getElementById("statsModal").style.display = "none";
+        document.getElementById("teamModal").style.display = "none";
+
+    }
+
+    window.onclick = function(event) {
+      const statsModal = document.getElementById("statsModal");
+    const teamModal = document.getElementById("teamModal");
+    if (event.target === statsModal) {
+        statsModal.style.display = "none";
+    } else if (event.target === teamModal) {
+        teamModal.style.display = "none";
+    }
+    }
+  </script>
+</head>
+<body class="bg-gray-900 dark:bg-gray-900 text-white">
+    <% if (user && user.role === 'admin') { %>
+    <a href="javascript:void(0);" class="nav-button" onclick="openModal('stats')">Update Stats</a>
+    <a href="javascript:void(1);" class="nav-button" onclick="openModal('team')">Update Team Roster</a>
+
+    <% } %>
+
+  <div class="container mx-auto p-6">
+    <h1 class="text-center text-3xl font-bold text-white"><%= title %></h1>
+
+    <div class="flex justify-center items-center space-x-4 mb-8">
+      <div class="text-center text-white">
+        <h2 class="text-sm text-white-400 text-2xl dark:text-gray-500">WINS: <%= team[0].wins %></h2>
+        <h2 class="text-sm text-white-400 text-2xl dark:text-gray-500">LOSES: <%= team[0].loses %></h2>
+        <h2 class="text-sm text-white-400 text-2xl dark:text-gray-500">PPG: <%= (team[0].pts /team[0].game_played).toFixed(1) %></h2>  
+        <h2 class="text-sm text-white-400 text-2xl dark:text-gray-500">APG: <%= (team[0].ast / team[0].game_played).toFixed(1) %></h2>  
+        <h2 class="text-sm text-white-400 text-2xl dark:text-gray-500">RPG: <%= (team[0].trb / team[0].game_played).toFixed(1) %></h2>
+      </div>
+
+      <img src="<%= team[0].logo %>" alt="<%= team[0].full_name %>" class="w-60 h-60 transition-all duration-300 hover:scale-110 center" style="object-fit: contain;" />
+   
+      <div class="text-center text-white">
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].team_id%></h2>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].full_name %></h2>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].city %></h2>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].nickname %></p>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].state %></p>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].year_founded %></p>
+        <h2 class="text-sm text-gray-400 dark:text-gray-500"><%= team[0].abbreviation %></p>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="text-center text-2xl font-semibold text-blue-400 dark:text-blue-300 mb-6">Team Roster</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <% team.forEach(player => { %>
+      <div class="player-card text-center">
+        <a href="/player/<%= player.player_id %>">
+          <% if (player.image) { %>
+            <img src="<%= player.image %>" alt="<%= player.full_name %>" class="player-image mx-auto" />
+          <% } else { %>
+            <img src="/default_player_image.jpg" alt="Default Player" class="player-image mx-auto" />
+          <% } %>
+        </a>
+        <a href="/player/<%= player.player_id %>" class="player-name hover:underline"><%= player.player_name %></a>
+        <p class="text-sm text-gray-400 dark:text-gray-500">Position: <%= player.pos %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <div id="statsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 class="text-center text-white mb-6">Update Team Stats</h2>
+        <form action="/team/update/<%= team[0].team_id %>" method="POST">
+        
+            <h3 class="text-white mb-4">Stats</h3>
+            <% ['wins','loses','pts','ast','trb'].forEach(stat => { %>
+                <label for="<%= stat %>" class="text-white"><%= stat.toUpperCase() %>:</label>
+                <input type="number" step="any" name="<%= stat %>" id="<%= stat %>" value="<%= team[0][stat] %>" class="bg-gray-800 text-white p-2 rounded-md mb-4">
+            <% }); %>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full">Update Team</button>
+        </form>
+    </div>
+  </div>
+  <div id="teamModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 class="text-center text-white mb-6">Update Team Rosters</h2>
+        <form action="/team/updateroster/<%= team[0].team_id %>" method="POST">
+        
+            <h3 class="text-white mb-4">Stats</h3>
+            <% ['player_id'].forEach(stat => { %>
+                <label for="<%= stat %>" class="text-white"><%= stat.toUpperCase() %>:</label>
+                <input type="number" step="any" name="<%= stat %>" id="<%= stat %>" value="<%= team[0][stat] %>" class="bg-gray-800 text-white p-2 rounded-md mb-4">
+            <% }); %>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full">Update Team Roster</button>
+        </form>
+    </div>
+  </div>
+
+</body>
+</html>

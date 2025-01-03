@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats</title>
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" crossorigin='anonymous'></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Oswald:wght@400;500;600&display=swap');
+
+        body, html {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Oswald', sans-serif;
+        }
+
+        body {
+            background-color: #0a0b14; 
+        }
+
+        .container {
+            background-color: #1d2d50;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            padding: 24px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .player-info img {
+            width: 272px;
+            height: 200px;
+            border-radius: 8px;
+            margin-right: 24px;
+        }
+
+        .player-info p {
+            color: #f5f6fa;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .stats-table {
+            width: 100%;
+            margin-top: 32px;
+            overflow-x: auto;
+            border-collapse: collapse;
+        }
+
+        .stats-table th, .stats-table td {
+            padding: 12px;
+            border-bottom: 1px solid #2c3e50;
+            text-align: center;
+            color: #f5f6fa;
+            font-size: 1rem;
+        }
+
+        .stats-table th {
+            background-color: #2c3e50; 
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stats-table td {
+            background-color: #34495e; 
+            font-weight: 400;
+        }
+
+        .stats-table tr:hover {
+            background-color: #fcbd56;  
+        }
+
+        .stats-table td.normalized-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .stats-table td span {
+            font-weight: 700;
+        }
+
+        .modal {
+            display: none;  
+            position: fixed;  
+            z-index: 1;  
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;  
+            background-color: rgba(0, 0, 0, 0.4);  
+        }
+
+        .modal-content {
+            background-color: #1d2d50;
+            color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="text-gray-200 p-6">
+
+    <% if (user && user.role === 'admin') { %>
+        <a class="nav-button" href="/player/delete/<%= player.player_id%> method="POST">Delete</a>
+        <a href="javascript:void(0);" class="nav-button" onclick="openModal()">Update</a>
+    <% } %>
+
+    <div class="container mx-auto w-full bg-white p-6 rounded-lg shadow-lg mb-6">
+
+        <div class="player-info">
+            <img src="<%= player.image %>" alt="Player Image">
+            <div class="flex flex-col justify-center">
+                <p><strong>Player ID:</strong> <%= player.player_id %></p>
+                <p><strong>First Name:</strong> <%= player.first_name %></p>
+                <p><strong>Last Name:</strong> <%= player.last_name %></p>
+                <p><strong>Team:</strong> <%= player.tm %></p>
+                <p><strong>Age:</strong> <%= player.age %></p>
+            </div>
+        </div>
+
+      <div class="mb-6 flex items-center justify-start space-x-4">
+        <label for="season" class="font-semibold text-black">Select Season:</label>
+        <select id="season" class="bg-black p-2 rounded-md text-white" onchange="changeSeason()">
+            <option value="2025" <%= season === '2025' ? 'selected' : '' %>>2025</option>
+            <option value="2024" <%= season === '2024' ? 'selected' : '' %>>2024</option>
+        </select>
+    </div>
+
+    <div class="overflow-x-auto w-full">
+        <table class="stats-table">
+            <thead>
+                <tr class="bg-gray-200 text-black">
+                    <% ['fg', 'fga', 'fg_percent', 'ft', 'fta', 'ft_percent', 'orb', 'drb', 'trb', 'pts', 'ast', 'stl', 'blk', 'g'].forEach(statName => { %>
+                        <th class="py-4 px-6 border-b font-semibold text-sm uppercase text-center"><%= statName.toUpperCase() %></th>
+                    <% }); %>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b">
+                    <% ['fg', 'fga', 'fg_percent', 'ft', 'fta', 'ft_percent', 'orb', 'drb', 'trb', 'pts', 'ast', 'stl', 'blk', 'g'].forEach(statName => { %>
+                        <td class="py-4 px-6 text-center">
+                            <% 
+                                // Normalize values, avoid division by zero
+                                const normalizedValue = statName !== 'fg_percent' && statName !== 'ft_percent' && statName !== 'g' && player.g
+                                    ? (player[statName] / player.g).toFixed(2) 
+                                    : player[statName];
+                            %>
+                            <%= normalizedValue %>
+                        </td>
+                    <% }); %>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Function to update stats based on selected season
+    function changeSeason() {
+        const season = document.getElementById("season").value;
+        window.location.href = `/player/<%= player.player_id %>?season=${season}`;
+    }
+</script>
+
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="text-center text-white mb-6">Update Player Stats</h2>
+            <form action="/player/update/<%= player.player_id %>" method="POST">
+            
+                <h3 class="text-white mb-4">Stats</h3>
+                <% ['pts', 'ast', 'orb', 'drb', 'trb', 'stl', 'blk', 'fg_percent', 'ft_percent'].forEach(stat => { %>
+                    <label for="<%= stat %>" class="text-white"><%= stat.toUpperCase() %>:</label>
+                    <input type="number" step="any" name="<%= stat %>" id="<%= stat %>" value="<%= player[stat] %>" class="bg-gray-800 text-white p-2 rounded-md mb-4">
+                <% }); %>
+
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full">Update Player</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("updateModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("updateModal").style.display = "none";
+        }
+    </script>
+    
+
+</body>
+</html>

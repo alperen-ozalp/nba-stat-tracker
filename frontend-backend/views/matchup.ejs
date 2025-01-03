@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .dark .bg-gray-900 {
+      background-color: #8eaeef;
+    }
+
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .button-hover {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      background: linear-gradient(45deg, #fcbd56, #ff8c00);
+      color: #1d2d50;
+      border-radius: 50px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .button-hover:hover {
+      background: linear-gradient(45deg, #ff8c00, #fcbd56);
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Stat styles */
+    .player-stats {
+      font-size: 0.9rem;
+      color: #ffbd56;
+    }
+
+    .player-stats span {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 dark:bg-gray-900 text-white">
+  <div class="mt-6 text-center">
+    <button onclick="calculateMatchup()" class="button-hover">Matchup Teams</button>
+  </div>
+  <div class="container mx-auto p-6">
+    <h1 class="text-center text-3xl font-bold text-white"></h1>
+
+    <div class="mb-6">
+      <input type="text" id="search" class="w-full p-3 rounded-lg bg-gray-800 dark:bg-gray-700 text-white placeholder-gray-500" placeholder="Search players..." onkeyup="filterPlayers()" />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
+      <div class="bg-gray-800 dark:bg-gray-700 p-4 rounded-lg">
+        <h2 class="text-xl font-semibold text-center text-white">Team A</h2>
+        <ul id="teamAList" class="mt-4">
+        </ul>
+      </div>
+
+      <div class="bg-gray-800 dark:bg-gray-700 p-4 rounded-lg">
+        <h2 class="text-xl font-semibold text-center text-white">Team B</h2>
+        <ul id="teamBList" class="mt-4">
+        </ul>
+      </div>
+    </div>
+
+    <ul id="playersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+      <% players.forEach(player => { %>
+        <li class="player-card bg-gray-800 dark:bg-gray-700 p-4 rounded-lg text-white card-hover">
+          <img src="<%= player.image %>" alt="<%= player.full_name %>" class="w-60 h-auto rounded-full mx-auto mb-4" />
+          <p class="text-lg text-center"><%= player.full_name %></p>
+          
+          <div class="player-stats text-center">
+            <span>Pts: <%= player.pts %></span>
+            <span>Ast: <%= player.ast %></span>
+            <span>Trb: <%= player.trb %></span>
+            <span>Stl: <%= player.stl %></span>
+            <span>Blk: <%= player.blk %></span>
+          </div>
+          
+          <button onclick="addPlayerToTeam('<%= player.player_id %>', '<%= player.full_name%>', '<%= player.pts %>', '<%= player.ast %>', '<%= player.trb %>', '<%= player.stl %>', '<%= player.blk %>','<%= player.g %>' ,'A')" class="button-hover mt-4">Add to Team A</button>
+          <button onclick="addPlayerToTeam('<%= player.player_id %>', '<%= player.full_name %>', '<%= player.pts %>', '<%= player.ast %>', '<%= player.trb %>', '<%= player.stl %>', '<%= player.blk %>','<%= player.g %>', 'B')" class="button-hover mt-2">Add to Team B</button>
+        </li>
+      <% }); %>
+    </ul>
+
+    
+  </div>
+
+  <script>
+    let teamA = [];
+    let teamB = [];
+
+    function filterPlayers() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const playersGrid = document.getElementById('playersGrid');
+      const playerCards = playersGrid.querySelectorAll('.player-card');
+
+      playerCards.forEach(card => {
+        const playerName = card.querySelector('.text-lg').innerText.toLowerCase();
+        if (playerName.includes(searchQuery)) {
+          card.style.display = 'block';  
+        } else {
+          card.style.display = 'none'; 
+        }
+      });
+    }
+
+    function addPlayerToTeam(player_id, full_name, pts, ast, trb, stl, blk, g,team) {
+      const player = { 
+        player_id, 
+        full_name,
+        pts: (parseInt(pts) / parseInt(g)).toFixed(1),
+        ast: (parseInt(ast)/ parseInt(g)).toFixed(1),
+        trb: (parseInt(trb)/ parseInt(g)).toFixed(1),
+        stl: (parseInt(stl)/ parseInt(g)).toFixed(1),
+        blk: (parseInt(blk)/ parseInt(g)).toFixed(1),
+      };
+      console.log(player);  
+
+   
+      if (team === 'A') {
+        teamA.push(player);
+        renderTeam('A');
+      } else if (team === 'B') {
+        teamB.push(player);
+        renderTeam('B');
+      }
+    }
+
+    function renderTeam(team) {
+      const teamList = document.getElementById(`team${team}List`);
+      const teamData = team === 'A' ? teamA : teamB;
+
+      teamList.innerHTML = ''; 
+      teamData.forEach(player => {
+        const listItem = document.createElement('li');
+        listItem.className = 'text-white bg-gray-700 rounded-lg p-2 mb-2 flex justify-between items-center';
+        listItem.innerHTML = `
+          <span>${player.full_name}</span>
+          <div class="player-stats">
+            <span>Pts: ${player.pts}</span>
+            <span>Ast: ${player.ast}</span>
+            <span>Trb: ${player.trb}</span>
+            <span>Stl: ${player.stl}</span>
+            <span>Blk: ${player.blk}</span>
+          </div>
+          <button onclick="removePlayerFromTeam('${team}', '${player.player_id}')" class="bg-red-500 hover:bg-red-700 text-white rounded-lg px-3 py-1">Remove</button>
+        `;
+        teamList.appendChild(listItem);
+      });
+    }
+
+    function removePlayerFromTeam(team, player_id) {
+      if (team === 'A') {
+        teamA = teamA.filter(player => player.player_id !== player_id);
+        renderTeam('A');
+      } else {
+        teamB = teamB.filter(player => player.player_id !== player_id);
+        renderTeam('B');
+      }
+    }
+
+    function calculateMatchup() {
+      let total1 = 0;
+      let total2 = 0;
+
+      teamA.forEach(player => {
+        const playerScore = 
+          player.pts * 0.65 + 
+          player.ast * 1.3 + 
+          player.trb * 1 + 
+          player.stl * 1.7 + 
+          player.blk * 1.7;
+
+        total1 += playerScore; 
+      });
+
+      teamB.forEach(player => {
+        const playerScore = 
+          player.pts * 0.65 + 
+          player.ast * 1.3 + 
+          player.trb * 1 + 
+          player.stl * 1.7 + 
+          player.blk * 1.7;
+
+        total2 += playerScore;  
+      });
+
+      const teamAScore = total1.toFixed(0);
+      const teamBScore = total2.toFixed(0);
+
+      alert(`Team A Score: ${teamAScore}, Team B Score: ${teamBScore}`);
+      alert(`Winner: ${teamAScore > teamBScore ? 'Team A' : 'Team B'}`);
+    }
+  </script>
+</body>
+</html>

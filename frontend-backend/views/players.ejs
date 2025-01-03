@@ -1,0 +1,212 @@
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #1d2d50;
+      color: white;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 500px;
+    }
+
+    .logo-hover {
+      transition: transform 0.4s ease, filter 0.4s ease;
+      box-shadow: 0 2px 10px rgba(0, 255, 85, 0.2);
+    }
+
+    .logo-clicked {
+      transform: scale(1.4) translateY(-70px);
+    }
+
+    .logo-hover:active {
+      transform: scale(1.25);
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+    }
+
+    .button-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      background: linear-gradient(45deg, #fcbd56, #ff8c00);
+      color: #1d2d50;
+      padding: 12px 24px;
+      border-radius: 50px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      display: inline-block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .button-hover:hover {
+      background: linear-gradient(45deg, #ff8c00, #fcbd56);
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    #search {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      border-radius: 25px;
+      border: none;
+      background-color: #2a3b56;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #search::placeholder {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <body>
+    <div class="px-100 py-50">
+      <div class="items-center space-x-4 mb-8">
+        <% if (user && user.role === 'admin') { %>
+          <div class="flex justify-center items-center space-x-4 mb-8">
+            <form id="deleteForm" action="/player/delete/" method="POST" class="inline-block w-full max-w-xs">
+              <label for="player_id">Player ID:</label>
+              <input type="number" name="player_id" id="player_id" class="bg-gray-800 text-white p-2 rounded-md mb-4 w-full"
+                placeholder="Enter Player ID" required>
+              <button type="submit"
+                class="bg-red-500 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md w-full">Delete</button>
+            </form>
+            <a href="javascript:void(0);"
+              class="nav-button inline-block ml-4 bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-md"
+              onclick="openModal()">Create New Player</a>
+          </div>
+        <% } %>
+  
+        <div id="updateModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="text-center text-white mb-6">Create New Player</h2>
+            <form action="/player/create" method="POST">
+              <h3 class="text-white mb-4">Stats</h3>
+              <% ['player_id', 'full_name' , 'first_name' , 'last_name' , 'team_id' ].forEach(stat=> { %>
+                <label for="<%= stat %>" class="text-white">
+                  <%= stat.toUpperCase() %>:
+                </label>
+                <% if (stat === 'player_id' || stat === 'team_id' ) { %>
+                  <input type="number" name="<%= stat %>" id="<%= stat %>" value=""
+                    class="bg-gray-800 text-white p-2 rounded-md mb-4 w-full" placeholder="<%= stat.toUpperCase() %>"
+                    required>
+                <% } else { %>
+                  <input type="text" name="<%= stat %>" id="<%= stat %>" value=""
+                    class="bg-gray-800 text-white p-2 rounded-md mb-4 w-full"
+                    placeholder="<%= stat.toUpperCase() %>" required>
+                <% } %>
+              <% }); %>
+  
+              <button type="submit"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full">Create</button>
+            </form>
+          </div>
+        </div>
+  
+        <div class="mb-6">
+          <input type="text" id="search"
+            class="w-50 p-3 rounded-lg bg-gray-800 dark:bg-gray-700 text-white placeholder-gray-500"
+            placeholder="Search players..." onkeyup="filterPlayers()" />
+        </div>
+  
+        <div id="playersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-6">
+          <% players.forEach(player => { %>
+            <div
+              class="player-card bg-gray-800 dark:bg-gray-700 rounded-lg shadow-lg p-6 text-center transition-all duration-300 card-hover">
+              <a href="/player/<%= player.player_id %>" class="logo-hover">
+                <img src="<%= player.image %>" alt="<%= player.full_name %>"
+                  class="w-75 h-75 mx-auto mb-4 transition-all duration-300 hover:scale-110"
+                  style="object-fit: contain;" />
+              </a>
+              <div class="text-lg font-semibold text-white-400 dark:text-blue-300">
+                <a href="/player/<%= player.player_id %>" class="hover:text-blue-500 dark:hover:text-blue-400">
+                  <%= player.full_name %>
+                </a>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+  
+        <div class="mt-6 text-center">
+          <a href="/team" class="button-hover">Go to Teams</a>
+        </div>
+      </div>
+    </div>
+  <script>
+    function filterPlayers() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const playersGrid = document.getElementById('playersGrid');
+      const playerCards = playersGrid.querySelectorAll('.player-card');
+
+      playerCards.forEach(card => {
+        const playerName = card.querySelector('.text-lg a').innerText.toLowerCase();
+        if (playerName.includes(searchQuery)) {
+          card.style.display = 'block';  
+        } else {
+          card.style.display = 'none'; 
+        }
+      });
+    }
+
+    document.querySelectorAll('.logo-hover').forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();   
+        const link = item.getAttribute('href');  
+        const logo = item.querySelector('img');   
+
+        logo.classList.add('logo-clicked');
+
+        setTimeout(() => {
+          window.location.href = link;   
+          logo.classList.remove('logo-clicked');
+        }, 1000);   
+      });
+    });
+
+    function openModal() {
+      document.getElementById("updateModal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("updateModal").style.display = "none";
+    }
+  
+    document.getElementById('deleteForm').addEventListener('submit', function (event) {
+      const playerId = document.getElementById('player_id').value;
+
+      if (!playerId) {
+        event.preventDefault();  
+        alert('Please enter a valid Player ID');
+      } else {
+        this.action = `/player/delete/${playerId}`;  
+      }
+    });
+  </script>
+</body>
